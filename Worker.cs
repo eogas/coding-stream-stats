@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace coding_stream_stats
+namespace CodingStreamStats
 {
     public class Worker : BackgroundService
     {
+        private static readonly TimeSpan Frequency = TimeSpan.FromMinutes(15);
+
         private readonly ILogger<Worker> _logger;
 
         public Worker(ILogger<Worker> logger)
@@ -17,12 +19,13 @@ namespace coding_stream_stats
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken token)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
+                
+                await Task.Delay(Frequency, token);
             }
         }
     }
