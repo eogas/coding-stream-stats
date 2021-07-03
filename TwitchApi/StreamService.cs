@@ -1,29 +1,27 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using CodingStreamStats.TwitchApi.Model;
-using Microsoft.Extensions.Logging;
 
 namespace CodingStreamStats.TwitchApi
 {
     public class StreamService
     {
-        protected readonly ILogger logger;
         protected readonly IHttpClientFactory httpClientFactory;
 
-        public StreamService(ILogger logger, IHttpClientFactory httpClientFactory)
+        public StreamService(IHttpClientFactory httpClientFactory)
         {
-            this.logger = logger ??
-                throw new ArgumentNullException(nameof(logger));
-            this.httpClientFactory = httpClientFactory ??
-                throw new ArgumentNullException(nameof(httpClientFactory));
+            this.httpClientFactory = httpClientFactory;
         }
 
-        public async IAsyncEnumerable<TwitchStream> GetAllProgrammingStreams()
+        public async IAsyncEnumerable<TwitchStream> GetAllCodingStreamsAsync(
+            [EnumeratorCancellation]CancellationToken token = default)
         {
             var client = httpClientFactory.CreateClient("twitch");
 
-            // TODO
+            var response = await client.GetAsync("streams", token);
+            var jsonRaw = await response.Content.ReadAsStringAsync();
 
             yield return null;
         }

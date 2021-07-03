@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CodingStreamStats.TwitchApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,19 +13,28 @@ namespace CodingStreamStats
     {
         private static readonly TimeSpan Frequency = TimeSpan.FromMinutes(15);
 
-        private readonly ILogger<Worker> _logger;
+        private readonly StreamService streamService;
+        private readonly ILogger<Worker> logger;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(
+            StreamService streamService,
+            ILogger<Worker> logger)
         {
-            _logger = logger;
+            this.streamService = streamService;
+            this.logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                
+                logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+
+                await foreach(var stream in streamService.GetAllCodingStreamsAsync(token))
+                {
+                    
+                }
+
                 await Task.Delay(Frequency, token);
             }
         }
