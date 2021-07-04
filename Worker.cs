@@ -30,9 +30,11 @@ namespace CodingStreamStats
             {
                 logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
+                int i = 0;
                 await foreach(var stream in streamService.GetAllCodingStreamsAsync(token))
                 {
-                    
+                    logger.LogInformation($"{i} {stream.Title}");
+                    i++;
                 }
 
                 await Task.Delay(Frequency, token);
